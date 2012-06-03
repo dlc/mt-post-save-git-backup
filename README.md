@@ -6,16 +6,16 @@ and entry after saving it to the database.
 
 To use, create an empty git repo somewhere as the web user:
 
-  # su - www-data
-  $ cd /tmp
-  $ mkdir backup
-  $ cd /tmp/backup
-  $ git init
+    # su - www-data
+    $ cd /tmp
+    $ mkdir backup
+    $ cd /tmp/backup
+    $ git init
 
 Install the plugin (assumes MTOS-4.38 in a default-ish place):
 
-  $ cd /var/www/htdocs/MTOS-4.38-en/plugins
-  $ git clone https://dlc@github.com/dlc/mt-post-save-git-backup.git MTPostSaveGitBackup
+    $ cd /var/www/htdocs/MTOS-4.38-en/plugins
+    $ git clone https://dlc@github.com/dlc/mt-post-save-git-backup.git MTPostSaveGitBackup
 
 Configure the plugin through the MT interface, setting the repo_directory
 field to the directory you configured in the first step.
