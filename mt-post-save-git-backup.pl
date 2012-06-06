@@ -12,9 +12,11 @@ use File::Basename qw(basename);
 use File::Path qw(mkpath);
 use MT;
 use MT::Log;
+use MT::Object;
 use MT::Plugin;
 use MT::Template;
 use MT::Template::Context;
+use MT::Template::ContextHandlers;
 use MT::Trackback;
 
 my $plugin = MT::Plugin->new({
@@ -45,30 +47,27 @@ MT::Template->add_callback('post_save', 10, $plugin, sub {
         my $type = "templates/" . $obj->type;
         my $name = $obj->name;
 
-        if (chdir $dir) {
-            my $out = "";
-            if (! -d "$dir/$type") {
-                mkpath("$dir/$type");
-                $out .= `git add $type`;
-            }
-
-            if (open my $fh, ">$dir/$type/$name") {
-                print $fh $obj->text;
-
-                $out .= `git add '$type/$name'`;
-                $out .= `git commit -m'Automatic commit' '$type/$name'`;
-            }
-
-            if ($out) {
-                MT->log({
-                    message     => $out,
-                    class       => "system",
-                    category    => "plugin",
-                    level       => MT::Log::INFO(),
-                });
-            }
+        my $out = "";
+        if (! -d "$dir/$type") {
+            mkpath("$dir/$type");
+            $out .= `(cd "$dir" && git add $type)`;
         }
-        chdir $cwd;
+
+        if (open my $fh, ">$dir/$type/$name") {
+            print $fh $obj->text;
+
+            $out .= `(cd "$dir" && git add '$type/$name')`;
+            $out .= `(cd "$dir" && git commit -m'Automatic commit' '$type/$name')`;
+        }
+
+        if ($out) {
+            MT->log({
+                message     => $out,
+                class       => "system",
+                category    => "plugin",
+                level       => MT::Log::INFO(),
+            });
+        }
     }
 });
 
@@ -83,30 +82,27 @@ MT::Entry->add_callback('post_save', 10, $plugin, sub {
         my $type = "entries";
         my $name = $obj->basename . ".txt";
 
-        if (chdir $dir) {
-            my $out = "";
-            if (! -d "$dir/$type") {
-                mkpath("$dir/$type");
-                $out .= `git add $type`;
-            }
-
-            if (open my $fh, ">$dir/$type/$name") {
-                print $fh format_entry($obj);
-
-                $out .= `git add '$type/$name'`;
-                $out .= `git commit -m'Automatic commit' '$type/$name'`;
-            }
-
-            if ($out) {
-                MT->log({
-                    message     => $out,
-                    class       => "system",
-                    category    => "plugin",
-                    level       => MT::Log::INFO(),
-                });
-            }
+        my $out = "";
+        if (! -d "$dir/$type") {
+            mkpath("$dir/$type");
+            $out .= `(cd "$dir" && git add $type)`;
         }
-        chdir $cwd;
+
+        if (open my $fh, ">$dir/$type/$name") {
+            print $fh format_entry($obj);
+
+            $out .= `(cd "$dir" && git add '$type/$name')`;
+            $out .= `(cd "$dir" && git commit -m'Automatic commit' '$type/$name')`;
+        }
+
+        if ($out) {
+            MT->log({
+                message     => $out,
+                class       => "system",
+                category    => "plugin",
+                level       => MT::Log::INFO(),
+            });
+        }
     }
 });
 
